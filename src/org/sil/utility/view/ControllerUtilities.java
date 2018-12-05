@@ -83,7 +83,7 @@ public class ControllerUtilities {
 		return getFileToOpen(mainApp, "", sFileChooserFilterDescription, sFileExtensions);
 	}
 
-	protected static FileChooser initFileChooser(MainAppUtilities mainApp,
+	public static FileChooser initFileChooser(MainAppUtilities mainApp,
 			String sFileChooserFilterDescription, String sFileExtensions) {
 		return initFileChooser(mainApp, "", sFileChooserFilterDescription, sFileExtensions);
 	}
@@ -111,10 +111,10 @@ public class ControllerUtilities {
 	}
 
 	public static File doFileSaveAs(MainAppUtilities mainApp, Locale locale, Boolean fForceSave,
-			String lingTreeFilterDescription, String sTitle, String sFileExtension,
+			String appFilterDescription, String sTitle, String sFileExtension,
 			String sFileExtensions, String sPropertiesPath) {
 		FileChooser fileChooser = ControllerUtilities.initFileChooser(mainApp,
-				lingTreeFilterDescription, sFileExtensions);
+				appFilterDescription, sFileExtensions);
 
 		File file = null;
 		if (fForceSave) {

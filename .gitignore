@@ -38,3 +38,5 @@ resources/images
 *.bak
 *.xso
 *.properties~
+*.md~
+*.gitignore~
