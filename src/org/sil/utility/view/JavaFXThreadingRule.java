@@ -8,7 +8,7 @@
  * 
  */
 
-package org.sil.utility;
+package org.sil.utility.view;
 
 import java.util.concurrent.CountDownLatch;
 

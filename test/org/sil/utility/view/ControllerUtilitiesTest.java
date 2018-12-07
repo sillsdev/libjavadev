@@ -1,23 +1,28 @@
 // Copyright (c) 2016-2018 SIL International 
 // This software is licensed under the LGPL, version 2.1 or later 
 // (http://www.gnu.org/licenses/lgpl-2.1.html) 
-package org.sil.utility;
+package org.sil.utility.view;
 
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -48,6 +53,24 @@ public class ControllerUtilitiesTest {
 
 	@After
 	public void tearDown() throws Exception {
+	}
+
+	@Test
+	public void adjustMenusIfNeededTest() {
+		AnchorPane mainPane = new AnchorPane();
+		 VBox vbox = new VBox();
+		 mainPane.getChildren().add(vbox);
+		 MenuBar menuBar = new MenuBar();
+		 vbox.getChildren().add(menuBar);
+		 assertEquals(false, menuBar.useSystemMenuBarProperty().get());
+		 ControllerUtilities.adjustMenusIfNeeded("Mac OS X", mainPane);	 
+		 assertEquals(true, menuBar.useSystemMenuBarProperty().get());
+		 menuBar.useSystemMenuBarProperty().set(false);
+		 ControllerUtilities.adjustMenusIfNeeded("Windows 10", mainPane);	 
+		 assertEquals(false, menuBar.useSystemMenuBarProperty().get());
+		 ControllerUtilities.adjustMenusIfNeeded("Windows 10", mainPane);	 
+		 ControllerUtilities.adjustMenusIfNeeded("Linux", mainPane);	 
+		 assertEquals(false, menuBar.useSystemMenuBarProperty().get());
 	}
 
 	@Test
@@ -99,6 +122,25 @@ public class ControllerUtilitiesTest {
 		Stage stage = (Stage) tid.getDialogPane().getScene().getWindow();
 		Image icon = stage.getIcons().get(0);
 		assertNotNull(icon);
+	}
+
+	@Test
+	public void getValidLocalesTest() {
+		checkALocale("en", "English", "French (français)", "Spanish (español)");
+		checkALocale("es", "inglés (English)", "francés (français)", "español");
+		checkALocale("fr", "anglais (English)", "français", "espagnol (español)");
+	}
+	
+	private void checkALocale(String sLocale, String contains1, String contains2, String contains3) {
+		Locale myLocale = new Locale(sLocale);
+		Map<String, ResourceBundle> locales = ControllerUtilities.getValidLocales(myLocale, sPropertiesPath);
+		assertNotNull(locales);
+		assertEquals(3, locales.size());
+		Set<String> names = locales.keySet(); 
+		assertEquals(3, names.size());
+		assertTrue(names.contains(contains1));
+		assertTrue(names.contains(contains2));
+		assertTrue(names.contains(contains3));
 	}
 
 	@Test

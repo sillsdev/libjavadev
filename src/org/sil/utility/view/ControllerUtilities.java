@@ -12,10 +12,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import org.controlsfx.control.StatusBar;
+import org.sil.utility.service.ValidLocaleCollector;
 import org.sil.utility.ApplicationPreferencesUtilities;
 import org.sil.utility.MainAppUtilities;
 import org.sil.utility.StringUtilities;
@@ -25,12 +27,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -204,4 +209,19 @@ public class ControllerUtilities {
 		return loader;
 	}
 
+	public static void adjustMenusIfNeeded(String operatingSystem, Pane mainPane) {
+		if (operatingSystem.equals("Mac OS X")) {
+			   VBox vbox = (VBox) mainPane.getChildren().get(0);
+			   MenuBar menuBar = (MenuBar) vbox.getChildren().get(0);
+			   menuBar.useSystemMenuBarProperty().set(false);
+			   menuBar.useSystemMenuBarProperty().set(true);
+			}
+	}
+
+	public static Map<String, ResourceBundle> getValidLocales(Locale currentLocale, String resourceLocation) {
+		ValidLocaleCollector collector = new ValidLocaleCollector(currentLocale, resourceLocation);
+		collector.collectValidLocales();
+		Map<String, ResourceBundle> validLocales = collector.getValidLocales();
+		return validLocales;
+	}
 }
