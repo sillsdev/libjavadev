@@ -100,6 +100,19 @@ public class ControllerUtilitiesTest {
 	}
 
 	@Test
+	public void getLoaderViaBundleTest() throws IOException {
+		URL location = ControllerUtilitiesTest.class.getResource("fxml/QuickReferenceGuide.fxml");
+		Stage dialogStage = new Stage();
+		assertNull(dialogStage.getTitle());
+		FXMLLoader loader = ControllerUtilities.getLoader(mainApp, locale, dialogStage, kTitle,
+				location, resources);
+		assertNotNull(loader);
+		assertEquals(kTitle, dialogStage.getTitle());
+		Scene scene = dialogStage.getScene();
+		assertNotNull(scene);
+	}
+
+	@Test
 	public void getTextInputDialogTest() {
 		final String kContent = "contentText";
 		TextInputDialog tid = ControllerUtilities.getTextInputDialog(mainApp, kTitle, kContent,
@@ -129,6 +142,9 @@ public class ControllerUtilitiesTest {
 		checkALocale("en", "English", "French (français)", "Spanish (español)");
 		checkALocale("es", "inglés (English)", "francés (français)", "español");
 		checkALocale("fr", "anglais (English)", "français", "espagnol (español)");
+		checkALocaleViaBundle("en", "English", "French (français)", "Spanish (español)");
+		checkALocaleViaBundle("es", "inglés (English)", "francés (français)", "español");
+		checkALocaleViaBundle("fr", "anglais (English)", "français", "espagnol (español)");
 	}
 	
 	private void checkALocale(String sLocale, String contains1, String contains2, String contains3) {
@@ -136,7 +152,19 @@ public class ControllerUtilitiesTest {
 		Map<String, ResourceBundle> locales = ControllerUtilities.getValidLocales(myLocale, sPropertiesPath);
 		assertNotNull(locales);
 		assertEquals(3, locales.size());
-		Set<String> names = locales.keySet(); 
+		Set<String> names = locales.keySet();
+		assertEquals(3, names.size());
+		assertTrue(names.contains(contains1));
+		assertTrue(names.contains(contains2));
+		assertTrue(names.contains(contains3));
+	}
+
+	private void checkALocaleViaBundle(String sLocale, String contains1, String contains2, String contains3) {
+		Locale myLocale = new Locale(sLocale);
+		Map<String, ResourceBundle> locales = ControllerUtilities.getValidLocales(myLocale, resources.getBaseBundleName());
+		assertNotNull(locales);
+		assertEquals(3, locales.size());
+		Set<String> names = locales.keySet();
 		assertEquals(3, names.size());
 		assertTrue(names.contains(contains1));
 		assertTrue(names.contains(contains2));

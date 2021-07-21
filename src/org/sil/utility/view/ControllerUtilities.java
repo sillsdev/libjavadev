@@ -215,6 +215,23 @@ public class ControllerUtilities {
 		return loader;
 	}
 
+	public static FXMLLoader getLoader(MainAppUtilities mainApp, Locale locale, Stage dialogStage,
+			String title, URL location, ResourceBundle bundle) throws IOException {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(location);
+		loader.setResources(bundle);
+
+		AnchorPane page = loader.load();
+		dialogStage.initModality(Modality.WINDOW_MODAL);
+		dialogStage.initOwner(mainApp.getPrimaryStage());
+		Scene scene = new Scene(page);
+		dialogStage.setScene(scene);
+		// set the icon
+		dialogStage.getIcons().add(mainApp.getNewMainIconImage());
+		dialogStage.setTitle(title);
+		return loader;
+	}
+
 	public static void adjustMenusIfNeeded(String operatingSystem, Pane mainPane) {
 		if (operatingSystem.equals("Mac OS X")) {
 			   VBox vbox = (VBox) mainPane.getChildren().get(0);
@@ -226,6 +243,13 @@ public class ControllerUtilities {
 
 	public static Map<String, ResourceBundle> getValidLocales(Locale currentLocale, String resourceLocation) {
 		ValidLocaleCollector collector = new ValidLocaleCollector(currentLocale, resourceLocation);
+		collector.collectValidLocales();
+		Map<String, ResourceBundle> validLocales = collector.getValidLocales();
+		return validLocales;
+	}
+
+	public static Map<String, ResourceBundle> getValidLocales(Locale currentLocale, ResourceBundle bundle) {
+		ValidLocaleCollector collector = new ValidLocaleCollector(currentLocale, bundle.getBaseBundleName());
 		collector.collectValidLocales();
 		Map<String, ResourceBundle> validLocales = collector.getValidLocales();
 		return validLocales;
