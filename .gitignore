@@ -40,3 +40,8 @@ resources/images
 *.properties~
 *.md~
 *.gitignore~
+*.*~
+*.sln
+x64/
+.vs/
+*.user
