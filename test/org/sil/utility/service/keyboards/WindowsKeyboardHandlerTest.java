@@ -41,22 +41,32 @@ public class WindowsKeyboardHandlerTest {
 	}
 
 	@Test
-	public void getKeyboardInfoFromLangIdTest() {
-		int langId = 0x0409;
-		KeyboardInfo info = handler.getKeyboardInfoFromLangId(langId);
-		checkKeyboardInfo(info, langId, "en", "en; English", true);
-		langId = 0x080A;
-		info = handler.getKeyboardInfoFromLangId(langId);
-		checkKeyboardInfo(info, langId, "es", "es_MX; Spanish (Mexico)", true);
-		langId = 0x0000;
-		info = handler.getKeyboardInfoFromLangId(langId);
-		checkKeyboardInfo(info, langId, "??", "??", false);
+	public void getKeyboardInfoFromProfileTest() {
+		// N.B. This will only work on a computer with four keyboards available:
+		// English, Mexico Spanish, Keyman IPA, and Keyman Hebrew
+		String profile = "1033\t'en-US'";
+		KeyboardInfo info = handler.getKeyboardInfoFromProfile(profile);
+		checkKeyboardInfo(info, 0x0409, "en", "en_US; English (United States)", true);
+		profile = "2058\t'es-MX'";
+		info = handler.getKeyboardInfoFromProfile(profile);
+		checkKeyboardInfo(info, 0x080A, "es", "es_MX; Spanish (Mexico)", true);
+		profile = "8192\t'hbo-Hebr-IL'";
+		info = handler.getKeyboardInfoFromProfile(profile);
+		checkKeyboardInfo(info, 8192, "hbo", "Ancient Hebrew (hbo-Hebr-IL) Hebrew (SIL)", true);
+		profile = "9216\t'und-Latn-001'";
+		info = handler.getKeyboardInfoFromProfile(profile);
+		checkKeyboardInfo(info, 9216, "", "und-Latn (und-Latn) IPA (SIL)", true);
+		profile = null;
+		info = handler.getKeyboardInfoFromProfile(profile);
+		checkKeyboardInfo(info, 0, "??", "??", false);
+		profile = "";
+		info = handler.getKeyboardInfoFromProfile(profile);
+		checkKeyboardInfo(info, 0, "", "; ", false);
 	}
 
 	protected void checkKeyboardInfo(KeyboardInfo info, int langId, String localeLanguage, String description, Boolean localeExists) {
 		assertNotNull(info);
 		if (info.getLocale() != null) {
-			assertEquals(true, localeExists);
 			assertEquals(localeLanguage, info.getLocale().getLanguage());
 		} else {
 			assertEquals(false, localeExists);
@@ -72,16 +82,16 @@ public class WindowsKeyboardHandlerTest {
 		List<KeyboardInfo> availableKeyboards = handler.getAvailableKeyboards();
 		assertEquals(4, availableKeyboards.size());
 		KeyboardInfo info = availableKeyboards.get(0);  // English
-		checkKeyboardInfo(info, 0x0409, "en", "en; English", true);
+		checkKeyboardInfo(info, 0x0409, "en", "en_US; English (United States)", true);
 		
 		info = availableKeyboards.get(1);  // Spanish (Mexico)
 		checkKeyboardInfo(info, 0x080A, "es", "es_MX; Spanish (Mexico)", true);
 		
 		info = availableKeyboards.get(2);  // Hebrew
-		checkKeyboardInfo(info, 0x2000, "", "Ancient Hebrew (hbo-Hebr-IL) Hebrew (SIL)", false);
+		checkKeyboardInfo(info, 0x2000, "hbo", "Ancient Hebrew (hbo-Hebr-IL) Hebrew (SIL)", true);
 
 		info = availableKeyboards.get(3);  // IPA
-		checkKeyboardInfo(info, 0x2400, "", "und-Latn (und-Latn) SIL IPA", false);
+		checkKeyboardInfo(info, 0x2400, "", "und-Latn (und-Latn) IPA (SIL)", true);
 	}
 	
 // Does not get a real stage; would have to extend an Application and launch it (I think)

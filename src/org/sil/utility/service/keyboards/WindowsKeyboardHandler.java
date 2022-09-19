@@ -44,7 +44,7 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
     }
 
     Pointer hWnd;
-    Locales locales = new Locales();
+    final String notKeymanKeyboard = "??";
     
 	@Override
 	public boolean changeToKeyboard(KeyboardInfo info, Stage stage) {
@@ -55,17 +55,6 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 		int langId = info.getWindowsLangID();
 		final int WM_INPUTLANGCHANGEREQUEST = 0x0050; 
 		boolean result = WinUserLibrary.INSTANCE.PostMessageW(hWnd, WM_INPUTLANGCHANGEREQUEST, 0, langId);
-//		Locale l = locales.fromLcid(langId);
-//		if (l != null) {
-//			String country = "";
-//			if (l.getCountry().length() > 0) {
-//				country = "_" + l.getCountry();
-//			}
-//			System.out.println("l=" + l.getLanguage() + country + "; " + l.getDisplayName());
-//		} else {
-//			// maybe it's a Keyman language
-//			System.out.println("l=" + findLangIdAsKeymanKeyboard(langId));
-//		}
 		return result;
 	}
 
@@ -101,7 +90,7 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 				}
 			}
 		}
-		return "??";
+		return notKeymanKeyboard;
 	}
 
 	protected String findKeymanKeyboardDisplayInfo(String s, String key) {
@@ -144,19 +133,19 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 		String[] sLangIDs = new String[100];
 		int iCount = getCurrentWindowsLangIDs(sLangIDs);
 		for (int i = 0; i < iCount; i++) {
-			KeyboardInfo info = getKeyboardInfoFromLangId(Integer.parseInt(sLangIDs[i]));
+			KeyboardInfo info = getKeyboardInfoFromProfile(sLangIDs[i]);
 			results.add(info);
 		}
 		return results;
 	}
 
-	protected int getCurrentWindowsLangIDs(String[] sLangIDs) {
+	protected int getCurrentWindowsProfiles(String[] sLangIDs) {
 		int iCount = 0;
 		try {
 			StringBuilder sb = new StringBuilder();
 			sb.append("\"");
 			sb.append(System.getProperty("user.dir"));
-			sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardLangIDs.exe\"");
+			sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardProfiles.exe\"");
 			
 			final String dosCommand = sb.toString();
 			final Process process = Runtime.getRuntime().exec(dosCommand);
@@ -186,22 +175,87 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 		return iCount;
 	}
 
-	public KeyboardInfo getKeyboardInfoFromLangId(int langId) {
+	public KeyboardInfo getKeyboardInfoFromProfile(String profile) {
+		int langId = getLangIdFromProfile(profile);
+		Locale locale = getLocaleFromProfile(profile);
 		String description = "";
-		Locale l = locales.fromLcid(langId);
-		if (l != null) {
+
+		if (locale != null) {
 			String country = "";
-			if (l.getCountry().length() > 0) {
-				country = "_" + l.getCountry();
+			if (locale.getCountry().length() > 0) {
+				country = "_" + locale.getCountry();
 			}
-			description = l.getLanguage() + country + "; " + l.getDisplayName();
+			// We prefer Keyman's description over the one derived from the locale
+			description = findLangIdAsKeymanKeyboard(langId);
+			if (description.equals(notKeymanKeyboard)) {
+				description = locale.getLanguage() + country + "; " + locale.getDisplayName();
+			}
 		} else {
 			// maybe it's a Keyman language
 			description = findLangIdAsKeymanKeyboard(langId);
 		}
-		KeyboardInfo info = new KeyboardInfo(l, description, langId);
+		KeyboardInfo info = new KeyboardInfo(locale, description, langId);
 //		System.out.println("l=" + description);
 		return info;
+	}
+
+	protected int getLangIdFromProfile(String profile) {
+		int langId = 0;
+		if (profile != null) {
+			int iTab = profile.indexOf("\t");
+			if(iTab > -1) {
+				langId= Integer.parseInt(profile.substring(0, iTab));
+			}
+		}
+		return langId;
+	}
+
+	protected Locale getLocaleFromProfile(String profile) {
+		String id= "";
+		if (profile == null)
+			return null;
+		int iQuote1 = profile.indexOf("'");
+		if(iQuote1 > -1) {
+			id = profile.substring(iQuote1 + 1, profile.length() - 1);
+		}
+		Locale l = Locale.forLanguageTag(id) ;
+		return l;
+	}
+
+	protected int getCurrentWindowsLangIDs(String[] sLangIDs) {
+		int iCount = 0;
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append("\"");
+			sb.append(System.getProperty("user.dir"));
+			sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardProfiles.exe\"");
+
+			final String dosCommand = sb.toString();
+			final Process process = Runtime.getRuntime().exec(dosCommand);
+			final InputStream in = process.getInputStream();
+			StringBuilder sbs = new StringBuilder();
+			int ch;
+			while ((ch = in.read()) != -1) {
+				if (ch == 13) {
+					sLangIDs[iCount] = sbs.toString();
+					sbs = new StringBuilder();
+					iCount++;
+				} else if (ch != 10) {
+					sbs.append((char)ch);
+				}
+			}
+			int result = process.waitFor();
+			if (result != 0) {
+				System.out.println("WindowsKeyboardHandler.getCurrentWindowsLangIDs() process result wasn't zero; it was " + result);
+			}
+		} catch (IOException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		}
+		return iCount;
 	}
 
 	@Override
