@@ -54,4 +54,8 @@ public class KeyboardInfo {
 		this.windowsLangID = windowsLangID;
 	}
 	
+	@Override
+	public String toString() {
+		return getDescription() + "; " + getLocale();
+	}
 }

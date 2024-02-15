@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022 SIL International
+ * Copyright (c) 2022-2024 SIL International
  * This software is licensed under the LGPL, version 2.1 or later
  * (http://www.gnu.org/licenses/lgpl-2.1.html)
  */
@@ -53,6 +53,9 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 			System.out.println("hWnd=" + hWnd);
 		}
 		int langId = info.getWindowsLangID();
+		if (langId == 0) {
+			return false;
+		}
 		final int WM_INPUTLANGCHANGEREQUEST = 0x0050; 
 		boolean result = WinUserLibrary.INSTANCE.PostMessageW(hWnd, WM_INPUTLANGCHANGEREQUEST, 0, langId);
 		return result;
@@ -65,26 +68,28 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 	
 	protected String findLangIdAsKeymanKeyboard(int langId) {
 		final String KEYMAN_REGISTRY = "SOFTWARE\\Keyman\\Keyman Engine\\Active Keyboards";
-		String folders[] = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY);
-		for (String s : folders) {
-			String[] subfolders = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY + "\\" + s);
-			for (String sub: subfolders) {
-				TreeMap<String,Object> languages = Advapi32Util.registryGetValues(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY + "\\" + s + "\\" + sub);
-				for (Map.Entry<String, Object> entry : languages.entrySet()) {
-					String key = entry.getKey();
-					Object obj = entry.getValue();
-					if (obj instanceof String) {
-						String data = (String) obj;
-						int thisLangId = -1;
-						int indexOfColon = data.indexOf(":");
-						if (indexOfColon > -1) {
-							String sLangId = data.substring(0, indexOfColon);
-							thisLangId = Integer.parseInt(sLangId, 16);
-						}
-						if (thisLangId == langId) {
-							// now we know that the langId is for this one; get its display info
-							String sResult = findKeymanKeyboardDisplayInfo(s, key);
-							return sResult;
+		if (Advapi32Util.registryKeyExists(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY)) {
+			String folders[] = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY);
+			for (String s : folders) {
+				String[] subfolders = Advapi32Util.registryGetKeys(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY + "\\" + s);
+				for (String sub: subfolders) {
+					TreeMap<String,Object> languages = Advapi32Util.registryGetValues(WinReg.HKEY_CURRENT_USER, KEYMAN_REGISTRY + "\\" + s + "\\" + sub);
+					for (Map.Entry<String, Object> entry : languages.entrySet()) {
+						String key = entry.getKey();
+						Object obj = entry.getValue();
+						if (obj instanceof String) {
+							String data = (String) obj;
+							int thisLangId = -1;
+							int indexOfColon = data.indexOf(":");
+							if (indexOfColon > -1) {
+								String sLangId = data.substring(0, indexOfColon);
+								thisLangId = Integer.parseInt(sLangId, 16);
+							}
+							if (thisLangId == langId) {
+								// now we know that the langId is for this one; get its display info
+								String sResult = findKeymanKeyboardDisplayInfo(s, key);
+								return sResult;
+							}
 						}
 					}
 				}
