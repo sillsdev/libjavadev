@@ -1,12 +1,16 @@
 /**
- * Copyright (c) 2022 SIL International
+ * Copyright (c) 2022-2024 SIL International
  * This software is licensed under the LGPL, version 2.1 or later
  * (http://www.gnu.org/licenses/lgpl-2.1.html)
  */
 package org.sil.utility.service.keyboards;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sil.utility.view.ControllerUtilities;
 
 import javafx.stage.Stage;
 
@@ -39,5 +43,55 @@ public class KeyboardHandler {
 	public void setEmailSupportAddress(String emailAddress) {
 		sContent = emailAddress;
 	}
+
+	protected int getCurrentEnabledKeyboardIDs(String command, String[] sLangIDs) {
+		int iCount = 0;
+		try {
+			final Process process = Runtime.getRuntime().exec(command);
+			final InputStream in = process.getInputStream();
+			StringBuilder sbs = new StringBuilder();
+			int ch;
+			while ((ch = in.read()) != -1) {
+				if (ch == 10) {
+					sLangIDs[iCount] = sbs.toString();
+					sbs = new StringBuilder();
+					iCount++;
+				} else if (ch != 13) {
+					sbs.append((char)ch);
+				}
+			}
+			int result = process.waitFor();
+			if (result != 0) {
+				System.out.println("KeyboardHandler.getCurrentEnabledKeyboardIDs() process result wasn't zero; it was " + result);
+			}
+		} catch (IOException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		}
+		return iCount;
+	}
+
+	protected boolean invokeTerminalCommand(String command) {
+		boolean succeeded = false;
+		try {
+			final Process process = Runtime.getRuntime().exec(command);
+			int result = process.waitFor();
+			if (result != 0) {
+				System.out.println("KeyboardHandler.invokeCommand() process result wasn't zero; it was " + result);
+			}
+			succeeded = (result == 0);
+		} catch (IOException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		}
+		return succeeded;
+	}
+
 
 }

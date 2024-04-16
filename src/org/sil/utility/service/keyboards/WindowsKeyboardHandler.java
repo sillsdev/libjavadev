@@ -7,7 +7,6 @@ package org.sil.utility.service.keyboards;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -144,42 +143,6 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 		return results;
 	}
 
-	protected int getCurrentWindowsProfiles(String[] sLangIDs) {
-		int iCount = 0;
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("\"");
-			sb.append(System.getProperty("user.dir"));
-			sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardProfiles.exe\"");
-			
-			final String dosCommand = sb.toString();
-			final Process process = Runtime.getRuntime().exec(dosCommand);
-			final InputStream in = process.getInputStream();
-			StringBuilder sbs = new StringBuilder();
-			int ch;
-			while ((ch = in.read()) != -1) {
-				if (ch == 13) {
-					sLangIDs[iCount] = sbs.toString();
-					sbs = new StringBuilder();
-					iCount++;
-				} else if (ch != 10) {
-					sbs.append((char)ch);
-				}
-			}
-			int result = process.waitFor();
-			if (result != 0) {
-				System.out.println("WindowsKeyboardHandler.getCurrentWindowsLangIDs() process result wasn't zero; it was " + result);
-			}
-		} catch (IOException e) {
-			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
-			e.printStackTrace();
-		}
-		return iCount;
-	}
-
 	public KeyboardInfo getKeyboardInfoFromProfile(String profile) {
 		int langId = getLangIdFromProfile(profile);
 		Locale locale = getLocaleFromProfile(profile);
@@ -228,39 +191,13 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 	}
 
 	protected int getCurrentWindowsLangIDs(String[] sLangIDs) {
-		int iCount = 0;
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("\"");
-			sb.append(System.getProperty("user.dir"));
-			sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardProfiles.exe\"");
+		StringBuilder sb = new StringBuilder();
+		sb.append("\"");
+		sb.append(System.getProperty("user.dir"));
+		sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardProfiles.exe\"");
 
-			final String dosCommand = sb.toString();
-			final Process process = Runtime.getRuntime().exec(dosCommand);
-			final InputStream in = process.getInputStream();
-			StringBuilder sbs = new StringBuilder();
-			int ch;
-			while ((ch = in.read()) != -1) {
-				if (ch == 13) {
-					sLangIDs[iCount] = sbs.toString();
-					sbs = new StringBuilder();
-					iCount++;
-				} else if (ch != 10) {
-					sbs.append((char)ch);
-				}
-			}
-			int result = process.waitFor();
-			if (result != 0) {
-				System.out.println("WindowsKeyboardHandler.getCurrentWindowsLangIDs() process result wasn't zero; it was " + result);
-			}
-		} catch (IOException e) {
-			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
-			e.printStackTrace();
-		}
-		return iCount;
+		final String dosCommand = sb.toString();
+		return getCurrentEnabledKeyboardIDs(dosCommand, sLangIDs);
 	}
 
 	@Override
