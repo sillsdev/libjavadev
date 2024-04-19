@@ -40,12 +40,16 @@ OSStatus set_by_name(const char** argv, const NSString* prefix) {
 
 static void showEnabledKeyboards(long sourceCountHab, CFArrayRef sourceList) {
     char layout[128];
+    char local[128];
     for (int i = 0; i < sourceCountHab; i++) {
         memset(layout, '\0', sizeof(layout));
+        memset(local, '\0', sizeof(local));
         TISInputSourceRef source = (TISInputSourceRef)CFArrayGetValueAtIndex(sourceList, i);
         CFStringRef layoutID = TISGetInputSourceProperty(source, kTISPropertyInputSourceID);
+        CFStringRef localName = TISGetInputSourceProperty(source, kTISPropertyLocalizedName);
         CFStringGetCString(layoutID, layout, sizeof(layout), kCFStringEncodingUTF8);
-        printf("%s\n", layout);
+        CFStringGetCString(localName, local, sizeof(local), kCFStringEncodingUTF8);
+        printf("%s|||%s\n", layout, local);
     }
 }
 
