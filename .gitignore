@@ -43,5 +43,6 @@ resources/images
 *.*~
 *.sln
 x64/
+ARM/
 .vs/
 *.user
