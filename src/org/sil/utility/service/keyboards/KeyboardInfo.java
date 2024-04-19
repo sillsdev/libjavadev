@@ -19,15 +19,15 @@ public class KeyboardInfo {
 	String sLocale;
 	String description;
 	String macDescription;
-	int windowsLangID = 0;
-	int macKeyboardIndex = 0;
+	int windowsLangID = -1;
+	int macKeyboardIndex = -1;
 	
 	public KeyboardInfo() {
 		sLocale = "en";
 		locale = new Locale(sLocale);
 		description = "English";
-		windowsLangID = 0;
-		macKeyboardIndex = 0;
+		windowsLangID = -1;
+		macKeyboardIndex = -1;
 	}
 
 	public KeyboardInfo(Locale locale, String description) {
