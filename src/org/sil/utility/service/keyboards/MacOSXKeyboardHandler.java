@@ -18,6 +18,9 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 
 	@Override
 	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage) {
+		if (keyboard.getMacKeyboardIndex() >= getAvailableKeyboards().size()) {
+			return false;
+		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.getProperty("user.dir"));
 		sb.append("/resources/Keyboards/MacOSX/xkbswitch -s ");
@@ -42,20 +45,24 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 	}
 
 	public KeyboardInfo getKeyboardInfoFromKeyboardNameAndIndex(String imName, int index) {
-		if (imName == null || imName.equals("com.apple.CharacterPaletteIM") || imName.equals("com.apple.KeyboardViewer")) {
+		if (imName == null)
+			return null;
+		int idEndIndex = imName.indexOf("|||");
+		if (idEndIndex == -1) {
+			return null;
+		}
+		String sId = imName.substring(0, idEndIndex);
+		if (sId.equals("com.apple.CharacterPaletteIM") || sId.equals("com.apple.KeyboardViewer")) {
 			return null;
 		}
 		String description = "";
-		if (imName.equals("keyman.inputmethod.Keyman")) {
+		if (sId.equals("keyman.inputmethod.Keyman")) {
 			// TODO: handle Keyman situation, whatever that is...
 			description = "Keyman keyboard";
 			// Keyman on Mac OSX does not work with Java (yet)
 			return null;
 		} else {
-			int lastPeriod = imName.lastIndexOf(".");
-			if (lastPeriod > -1) {
-				description = imName.substring(lastPeriod+1);
-			}
+			description = imName.substring(idEndIndex+3);
 		}
 
 		KeyboardInfo info = new KeyboardInfo(description, index);
