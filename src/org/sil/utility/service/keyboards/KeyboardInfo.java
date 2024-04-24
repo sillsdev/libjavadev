@@ -79,6 +79,9 @@ public class KeyboardInfo {
 	}
 
 	public String getDescription() {
+		if (description == null) {
+			description = macDescription;
+		}
 		return description;
 	}
 

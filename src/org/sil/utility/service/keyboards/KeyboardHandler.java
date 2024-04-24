@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.sil.utility.view.ControllerUtilities;
 
@@ -93,5 +94,19 @@ public class KeyboardHandler {
 		return succeeded;
 	}
 
+	public KeyboardInfo getKeyboardInfoBasedOn(List<KeyboardInfo> availableKeyboards, String sLocale,
+			String description, int langId) {
+		KeyboardInfo info = null;
+		Optional<KeyboardInfo> optInfo = availableKeyboards
+				.stream()
+				.filter(k -> k.getSLocale().equals(sLocale) && k.getDescription().equals(description)
+						&& k.getWindowsLangID() == langId).findFirst();
+		if (optInfo.isPresent()) {
+			return optInfo.get();
+		} else {
+			info = new KeyboardInfo(sLocale, description, langId);
+		}
+		return info;
+	}
 
 }

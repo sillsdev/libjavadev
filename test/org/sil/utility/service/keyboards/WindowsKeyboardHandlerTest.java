@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022 SIL International
+ * Copyright (c) 2022-2024 SIL International
  * This software is licensed under the LGPL, version 2.1 or later
  * (http://www.gnu.org/licenses/lgpl-2.1.html)
  */
@@ -92,6 +92,23 @@ public class WindowsKeyboardHandlerTest {
 
 		info = availableKeyboards.get(3);  // IPA
 		checkKeyboardInfo(info, 0x2400, "", "und-Latn (und-Latn) IPA (SIL)", true);
+
+		// test looking for exising one, too
+		info = handler.getKeyboardInfoBasedOn(availableKeyboards, "en", "en_US; English (United States)", 0x0409);
+		checkKeyboardInfo(info, 0x0409, "en", "en_US; English (United States)", true);
+
+		info = handler.getKeyboardInfoBasedOn(availableKeyboards, "es", "es_MX; Spanish (Mexico)", 0x080A);
+		checkKeyboardInfo(info, 0x080A, "es", "es_MX; Spanish (Mexico)", true);
+
+		info = handler.getKeyboardInfoBasedOn(availableKeyboards, "hbo", "Ancient Hebrew (hbo-Hebr-IL) Hebrew (SIL)", 0x2000);
+		checkKeyboardInfo(info, 0x2000, "hbo", "Ancient Hebrew (hbo-Hebr-IL) Hebrew (SIL)", true);
+
+		info = handler.getKeyboardInfoBasedOn(availableKeyboards, "", "und-Latn (und-Latn) IPA (SIL)", 0x2400);
+		checkKeyboardInfo(info, 0x2400, "", "und-Latn (und-Latn) IPA (SIL)", true);
+
+		info = handler.getKeyboardInfoBasedOn(availableKeyboards, "fr", "Fake French", 0x9001);
+		checkKeyboardInfo(info, 0x9001, "fr", "Fake French", true);
+
 	}
 	
 // Does not get a real stage; would have to extend an Application and launch it (I think)
