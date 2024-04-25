@@ -25,6 +25,8 @@ import org.sil.utility.service.keyboards.WindowsKeyboardHandler;
 public class KeyboardChanger {
 
 	private static KeyboardChanger instance;
+	static final String COULD_NOT_CHANGE_KEYBOARD = "Could not change keyboard to ";
+	static final String KEYBOARD_ID = "; id=";
 
 	public static KeyboardChanger getInstance(){
         if(instance == null){
@@ -63,10 +65,10 @@ public class KeyboardChanger {
 	}
 
 	public void tryToChangeKeyboardTo(KeyboardInfo ki) {
+		if (activeKeyboards.size() == 0) {
+			return;  // nothing to do
+		}
 		if (keyboardHandler == winHandler) {
-			if (activeKeyboards.size() == 0) {
-				return;  // nothing to do
-			}
 			if (ki.getWindowsLangID() == 0) {
 				// always use the first keyboard if the ID is zero
 				ki = activeKeyboards.get(0);
@@ -76,7 +78,18 @@ public class KeyboardChanger {
 			}
 			boolean result = winHandler.changeToKeyboard(ki, stage);
 			if (!result) {
-				System.out.println("Could not change keyboard to " + ki.getDescription() + "; id=" + ki.getWindowsLangID());
+				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getDescription() + KEYBOARD_ID + ki.getWindowsLangID());
+			}
+		} else if (keyboardHandler == macHandler) {
+			if (ki.getMacKeyboardIndex() <= 0) {
+				// always use the first keyboard if the ID is negative (i.e, unspecified) or zero
+				ki = activeKeyboards.get(0);
+			} else {
+				ki = new KeyboardInfo(ki.getMacDescription(), ki.getMacKeyboardIndex());
+			}
+			boolean result = macHandler.changeToKeyboard(ki, stage);
+			if (!result) {
+				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getMacDescription() + KEYBOARD_ID + ki.getMacKeyboardIndex());
 			}
 		}
 	}
