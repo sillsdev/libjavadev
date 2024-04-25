@@ -18,9 +18,6 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 
 	@Override
 	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage) {
-		if (keyboard.getMacKeyboardIndex() >= getAvailableKeyboards().size()) {
-			return false;
-		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.getProperty("user.dir"));
 		sb.append("/resources/Keyboards/MacOSX/xkbswitch -s ");
