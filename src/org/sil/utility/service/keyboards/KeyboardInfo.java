@@ -20,14 +20,12 @@ public class KeyboardInfo {
 	String description;
 	String macDescription;
 	int windowsLangID = -1;
-	int macKeyboardIndex = -1;
 	
 	public KeyboardInfo() {
 		sLocale = "en";
 		locale = new Locale(sLocale);
 		description = "English";
 		windowsLangID = -1;
-		macKeyboardIndex = -1;
 	}
 
 	public KeyboardInfo(Locale locale, String description) {
@@ -54,11 +52,11 @@ public class KeyboardInfo {
 		this.windowsLangID = windowsLangID;
 	}
 
-	public KeyboardInfo(String description, int macKeyboardIndex) {
+	public KeyboardInfo(String macDescription, String description) {
 		this.sLocale = "en";
 		this.locale = new Locale(sLocale);
-		this.macDescription = description;
-		this.macKeyboardIndex = macKeyboardIndex;
+		this.macDescription = macDescription;
+		this.description = description;
 	}
 
 	public String getSLocale() {
@@ -105,14 +103,6 @@ public class KeyboardInfo {
 		this.windowsLangID = windowsLangID;
 	}
 	
-	public int getMacKeyboardIndex() {
-		return macKeyboardIndex;
-	}
-
-	public void setMacKeyboardIndex(int macKeyboardIndex) {
-		this.macKeyboardIndex = macKeyboardIndex;
-	}
-
 	@Override
 	public String toString() {
 		return getDescription() + "; " + getLocale();

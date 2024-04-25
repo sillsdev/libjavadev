@@ -7,8 +7,6 @@ package org.sil.utility.service.keyboards;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,7 +32,7 @@ public class MacOSXKeyboardHandlerTest {
 	public void tearDown() throws Exception {
 	}
 
-	protected void checkKeyboardInfo(KeyboardInfo info, int langId, String localeLanguage, String description, Boolean localeExists, int macIndex) {
+	protected void checkKeyboardInfo(KeyboardInfo info, int langId, String localeLanguage, String description, Boolean localeExists, String macDescription) {
 		assertNotNull(info);
 		if (info.getLocale() != null) {
 			assertEquals(localeLanguage, info.getLocale().getLanguage());
@@ -42,8 +40,8 @@ public class MacOSXKeyboardHandlerTest {
 			assertEquals(false, localeExists);
 		}
 		assertEquals(langId, info.getWindowsLangID());
-		assertEquals(description, info.getMacDescription());
-		assertEquals(macIndex, info.getMacKeyboardIndex());
+		assertEquals(description, info.getDescription());
+		assertEquals(macDescription, info.getMacDescription());
 	}
 	
 	@Test
@@ -55,29 +53,28 @@ public class MacOSXKeyboardHandlerTest {
 		//org.unknown.keylayout.IPAUnicode51v14MAC
 		//keyman.inputmethod.Keyman
 		String imName = "com.apple.keylayout.US|||US";
-		KeyboardInfo info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, 0);
-		checkKeyboardInfo(info, -1, "en", "US", true, 0);
+		KeyboardInfo info = macHandler.getKeyboardInfoFromKeyboardName(imName);
+		checkKeyboardInfo(info, -1, "en", "US", true, "com.apple.keylayout.US");
 		imName = "com.apple.keylayout.Spanish|||Spanish";
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, 1);
-		checkKeyboardInfo(info, -1, "en", "Spanish", true, 1);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
+		checkKeyboardInfo(info, -1, "en", "Spanish", true, "com.apple.keylayout.Spanish");
 		imName = "com.apple.CharacterPaletteIM|||Emoji & Symbols";
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, 2);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
 		assertNull(info);
 		imName = "com.apple.KeyboardViewer|||Keyboard Viewer";
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, 3);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
 		assertNull(info);
 		imName = "org.unknown.keylayout.IPAUnicode51v14MAC|||IPA Unicode 5.1(v1.4) MAC";
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, 4);
-		checkKeyboardInfo(info, -1, "en", "IPA Unicode 5.1(v1.4) MAC", true, 4);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
+		checkKeyboardInfo(info, -1, "en", "IPA Unicode 5.1(v1.4) MAC", true, "org.unknown.keylayout.IPAUnicode51v14MAC");
 		imName = "keyman.inputmethod.Keyman|||Keyman";
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, 5);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
 		assertNull(info);
-//		checkKeyboardInfo(info, 0, "en", "Keyman keyboard", true, 5);
 		imName = null;
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, -1);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
 		assertNull(info);
 		imName = "";
-		info = macHandler.getKeyboardInfoFromKeyboardNameAndIndex(imName, -1);
+		info = macHandler.getKeyboardInfoFromKeyboardName(imName);
 		assertNull(info);
 	}
 

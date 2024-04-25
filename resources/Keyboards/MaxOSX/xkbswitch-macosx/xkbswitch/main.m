@@ -132,14 +132,14 @@ int main(int argc, const char * argv[]) {
             exit(0);
         } else if (set_mode) {
             if (layout_by_name) {
-                OSStatus status = set_by_name(argv, @"com.apple.keylayout.");
+                OSStatus status = set_by_name(argv, @"");
                 if (status != noErr) {
-                    printf("There is no active layout with name in the default prefix \"%s\"\n", *argv);
-                    printf("Trying with the org.unknown.keylayout prefix...\n");
-                    status = set_by_name(argv, @"org.unknown.keylayout.");
-                    if (status != noErr) {
-                        printf("Unable to find an active layout with this name.\n");
-                    }
+                    printf("There is no active layout with name \"%s\"\n", *argv);
+//                    printf("Trying with the org.unknown.keylayout prefix...\n");
+//                    status = set_by_name(argv, @"org.unknown.keylayout.");
+//                    if (status != noErr) {
+//                        printf("Unable to find an active layout with this name.\n");
+//                    }
                 }
             } else if (layout_by_num) {
                 // Get the first argument. It is index of wanted keyboard layout
