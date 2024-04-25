@@ -81,15 +81,9 @@ public class KeyboardChanger {
 				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getDescription() + KEYBOARD_ID + ki.getWindowsLangID());
 			}
 		} else if (keyboardHandler == macHandler) {
-			if (ki.getMacKeyboardIndex() <= 0) {
-				// always use the first keyboard if the ID is negative (i.e, unspecified) or zero
-				ki = activeKeyboards.get(0);
-			} else {
-				ki = new KeyboardInfo(ki.getMacDescription(), ki.getMacKeyboardIndex());
-			}
 			boolean result = macHandler.changeToKeyboard(ki, stage);
 			if (!result) {
-				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getMacDescription() + KEYBOARD_ID + ki.getMacKeyboardIndex());
+				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getDescription() + "; (" + ki.getMacDescription() + ")");
 			}
 		}
 	}

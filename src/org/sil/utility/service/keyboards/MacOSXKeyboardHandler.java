@@ -20,8 +20,8 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.getProperty("user.dir"));
-		sb.append("/resources/Keyboards/MacOSX/xkbswitch -s ");
-		sb.append(Integer.toString(keyboard.getMacKeyboardIndex()));
+		sb.append("/resources/Keyboards/MacOSX/xkbswitch -se ");
+		sb.append(keyboard.getMacDescription());
 
 		final String command = sb.toString();
 		return invokeTerminalCommand(command);
@@ -33,7 +33,7 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 		String[] sLangIDs = new String[100];
 		int iCount = getCurrentMacOSXKeyboardIDs(sLangIDs);
 		for (int i = 0; i < iCount; i++) {
-			KeyboardInfo info = getKeyboardInfoFromKeyboardNameAndIndex(sLangIDs[i], i);
+			KeyboardInfo info = getKeyboardInfoFromKeyboardName(sLangIDs[i]);
 			if (info != null) {
 				results.add(info);
 			}
@@ -41,19 +41,19 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 		return results;
 	}
 
-	public KeyboardInfo getKeyboardInfoFromKeyboardNameAndIndex(String imName, int index) {
+	public KeyboardInfo getKeyboardInfoFromKeyboardName(String imName) {
 		if (imName == null)
 			return null;
 		int idEndIndex = imName.indexOf("|||");
 		if (idEndIndex == -1) {
 			return null;
 		}
-		String sId = imName.substring(0, idEndIndex);
-		if (sId.equals("com.apple.CharacterPaletteIM") || sId.equals("com.apple.KeyboardViewer")) {
+		String macDescription = imName.substring(0, idEndIndex);
+		if (macDescription.equals("com.apple.CharacterPaletteIM") || macDescription.equals("com.apple.KeyboardViewer")) {
 			return null;
 		}
 		String description = "";
-		if (sId.equals("keyman.inputmethod.Keyman")) {
+		if (macDescription.equals("keyman.inputmethod.Keyman")) {
 			// TODO: handle Keyman situation, whatever that is...
 			description = "Keyman keyboard";
 			// Keyman on Mac OSX does not work with Java (yet)
@@ -62,14 +62,13 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 			description = imName.substring(idEndIndex+3);
 		}
 
-		KeyboardInfo info = new KeyboardInfo(description, index);
-		System.out.println(index + " = '" + description + "'");
+		KeyboardInfo info = new KeyboardInfo(macDescription, description);
+		System.out.println(macDescription + " = '" + description + "'");
 		return info;
 	}
 
 	@Override
 	public String getExceptionContentMessage() {
-		// TODO Auto-generated method stub
 		return super.getExceptionContentMessage();
 	}
 
