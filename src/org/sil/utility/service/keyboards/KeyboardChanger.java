@@ -62,6 +62,11 @@ public class KeyboardChanger {
 		}
 		activeKeyboards = keyboardHandler.getAvailableKeyboards();
 		numberOfKeyboards = activeKeyboards.size();
+		keyboardHandler.rememberCurrentKeyboard();
+	}
+
+	public void closeKeyboardHandler() {
+		keyboardHandler.restoreCurrentKeyboard();
 	}
 
 	public void tryToChangeKeyboardTo(KeyboardInfo ki) {

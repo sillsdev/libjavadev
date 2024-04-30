@@ -45,6 +45,14 @@ public class KeyboardHandler {
 		sContent = emailAddress;
 	}
 
+	public void rememberCurrentKeyboard() {
+		// do nothing by default;
+	}
+
+	public void restoreCurrentKeyboard() {
+		// do nothing by default;
+	}
+
 	protected int getCurrentEnabledKeyboardIDs(String command, String[] sLangIDs) {
 		int iCount = 0;
 		try {

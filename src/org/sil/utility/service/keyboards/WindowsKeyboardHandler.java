@@ -49,7 +49,6 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 	public boolean changeToKeyboard(KeyboardInfo info, Stage stage) {
 		if (hWnd == null) {
 			hWnd = FXWinUtil.getNativeHandleForStage(stage);
-			System.out.println("hWnd=" + hWnd);
 		}
 		int langId = info.getWindowsLangID();
 		if (langId == 0) {
@@ -163,7 +162,6 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 			description = findLangIdAsKeymanKeyboard(langId);
 		}
 		KeyboardInfo info = new KeyboardInfo(locale, description, langId);
-//		System.out.println("l=" + description);
 		return info;
 	}
 

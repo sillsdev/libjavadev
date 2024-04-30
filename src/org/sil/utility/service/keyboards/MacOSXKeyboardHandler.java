@@ -5,8 +5,12 @@
  */
 package org.sil.utility.service.keyboards;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sil.utility.view.ControllerUtilities;
 
 import javafx.stage.Stage;
 
@@ -15,6 +19,8 @@ import javafx.stage.Stage;
  *
  */
 public class MacOSXKeyboardHandler extends KeyboardHandler {
+
+	String sCurrentKeyboardName = "";
 
 	@Override
 	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage) {
@@ -63,7 +69,6 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 		}
 
 		KeyboardInfo info = new KeyboardInfo(macDescription, description);
-		System.out.println(macDescription + " = '" + description + "'");
 		return info;
 	}
 
@@ -77,6 +82,49 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void rememberCurrentKeyboard() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(System.getProperty("user.dir"));
+		sb.append("/resources/Keyboards/MacOSX/xkbswitch -ge");
+
+		final String command = sb.toString();
+		invokeTerminalCommand(command);
+		try {
+			final Process process = Runtime.getRuntime().exec(command);
+			final InputStream in = process.getInputStream();
+			StringBuilder sbs = new StringBuilder();
+			int ch;
+			while ((ch = in.read()) != -1) {
+				if (ch != 13) {
+					sbs.append((char)ch);
+				}
+			}
+			int result = process.waitFor();
+			if (result != 0) {
+				System.out.println("KeyboardHandler.getCurrentEnabledKeyboardIDs() process result wasn't zero; it was " + result);
+			}
+			sCurrentKeyboardName = sbs.toString();
+		} catch (IOException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void restoreCurrentKeyboard() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(System.getProperty("user.dir"));
+		sb.append("/resources/Keyboards/MacOSX/xkbswitch -se ");
+		sb.append(sCurrentKeyboardName);
+
+		final String command = sb.toString();
+		invokeTerminalCommand(command);
+	}
+
 	protected int getCurrentMacOSXKeyboardIDs(String[] sLangIDs) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(System.getProperty("user.dir"));
@@ -85,6 +133,5 @@ public class MacOSXKeyboardHandler extends KeyboardHandler {
 		final String command = sb.toString();
 		return getCurrentEnabledKeyboardIDs(command, sLangIDs);
 	}
-
 
 }
