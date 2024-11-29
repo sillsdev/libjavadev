@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018 SIL International 
+// Copyright (c) 2016-2024 SIL International 
 // This software is licensed under the LGPL, version 2.1 or later 
 // (http://www.gnu.org/licenses/lgpl-2.1.html) 
 package org.sil.utility.view;
@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.junit.Test;
-import org.sil.utility.view.ObservableResourceFactory;
 
 public class ObservableResourceFactoryTest {
 

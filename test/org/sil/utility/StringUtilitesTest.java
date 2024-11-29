@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018 SIL International 
+// Copyright (c) 2016-2024 SIL International 
 // This software is licensed under the LGPL, version 2.1 or later 
 // (http://www.gnu.org/licenses/lgpl-2.1.html) 
 package org.sil.utility;
@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sil.utility.StringUtilities;
 
 public class StringUtilitesTest {
 

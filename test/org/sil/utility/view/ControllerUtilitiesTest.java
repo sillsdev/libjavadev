@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2018 SIL International 
+// Copyright (c) 2016-2024 SIL International 
 // This software is licensed under the LGPL, version 2.1 or later 
 // (http://www.gnu.org/licenses/lgpl-2.1.html) 
 package org.sil.utility.view;
@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.sil.utility.test.MainApp;
-import org.sil.utility.view.ControllerUtilities;
 
 public class ControllerUtilitiesTest {
 	@Rule
@@ -161,7 +160,7 @@ public class ControllerUtilitiesTest {
 
 	private void checkALocaleViaBundle(String sLocale, String contains1, String contains2, String contains3) {
 		Locale myLocale = new Locale(sLocale);
-		Map<String, ResourceBundle> locales = ControllerUtilities.getValidLocales(myLocale, resources.getBaseBundleName());
+		Map<String, ResourceBundle> locales = ControllerUtilities.getValidLocales(myLocale, sPropertiesPath);
 		assertNotNull(locales);
 		assertEquals(3, locales.size());
 		Set<String> names = locales.keySet();

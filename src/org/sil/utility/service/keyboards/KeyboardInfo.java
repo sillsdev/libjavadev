@@ -7,7 +7,8 @@ package org.sil.utility.service.keyboards;
 
 import java.util.Locale;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
+
 
 /**
  * @author Andy Black

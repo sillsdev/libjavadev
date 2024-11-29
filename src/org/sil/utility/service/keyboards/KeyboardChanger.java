@@ -11,12 +11,6 @@ import java.util.List;
 
 import javafx.stage.Stage;
 
-import org.sil.utility.service.keyboards.KeyboardHandler;
-import org.sil.utility.service.keyboards.KeyboardInfo;
-import org.sil.utility.service.keyboards.LinuxKeyboardHandler;
-import org.sil.utility.service.keyboards.MacOSXKeyboardHandler;
-import org.sil.utility.service.keyboards.WindowsKeyboardHandler;
-
 /**
  * @author Andy Black
  * Singleton pattern
