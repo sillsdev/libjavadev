@@ -30,8 +30,7 @@ module org.sil.utility {
 	requires com.sun.jna.platform;
 	
 	//JSON
-	requires json.simple;
-//	requires org.json.simple;
+	requires org.json;
 	
 	// JUnit
 	requires junit;

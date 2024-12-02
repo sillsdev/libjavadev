@@ -5,8 +5,9 @@
  */
 package org.sil.utility.service.keyboards;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +30,11 @@ public class KeyboardHandler {
 	String sEmailSupportAddress = "Language_Software_Support@sil.org";
 	protected String sContent = sContent1 + sEmailSupportAddress + sContent2;
 
-	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage) {
+	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage, Class<?extends Object> classOfMainApp) {
 		return false;
 	}
 
-	public List<KeyboardInfo> getAvailableKeyboards() {
+	public List<KeyboardInfo> getAvailableKeyboards(Class<?extends Object> classOfMainApp) {
 		return new ArrayList<KeyboardInfo>();
 	}
 	
@@ -45,11 +46,11 @@ public class KeyboardHandler {
 		sContent = emailAddress;
 	}
 
-	public void rememberCurrentKeyboard() {
+	public void rememberCurrentKeyboard(Class<?extends Object> classOfMainApp) {
 		// do nothing by default;
 	}
 
-	public void restoreCurrentKeyboard() {
+	public void restoreCurrentKeyboard(Class<?extends Object> classOfMainApp) {
 		// do nothing by default;
 	}
 
@@ -57,7 +58,7 @@ public class KeyboardHandler {
 		int iCount = 0;
 		try {
 			final Process process = Runtime.getRuntime().exec(command);
-			final InputStream in = process.getInputStream();
+			final BufferedReader in = process.inputReader(StandardCharsets.UTF_8);
 			StringBuilder sbs = new StringBuilder();
 			int ch;
 			while ((ch = in.read()) != -1) {

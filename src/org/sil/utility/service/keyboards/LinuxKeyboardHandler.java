@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022 SIL International
+ * Copyright (c) 2022-2024 SIL International
  * This software is licensed under the LGPL, version 2.1 or later
  * (http://www.gnu.org/licenses/lgpl-2.1.html)
  */
@@ -16,15 +16,15 @@ import javafx.stage.Stage;
 public class LinuxKeyboardHandler extends KeyboardHandler {
 
 	@Override
-	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage) {
+	public boolean changeToKeyboard(KeyboardInfo keyboard, Stage stage, Class<?extends Object> classOfMainApp) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public List<KeyboardInfo> getAvailableKeyboards() {
+	public List<KeyboardInfo> getAvailableKeyboards(Class<?extends Object> classOfMainApp) {
 		// TODO Auto-generated method stub
-		return super.getAvailableKeyboards();
+		return super.getAvailableKeyboards(classOfMainApp);
 	}
 
 	@Override

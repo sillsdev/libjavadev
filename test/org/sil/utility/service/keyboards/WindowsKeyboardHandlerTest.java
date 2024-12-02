@@ -79,7 +79,7 @@ public class WindowsKeyboardHandlerTest {
 	public void getAvailableKeyboardsTest() {
 		// N.B. This will only work on a computer with four keyboards available:
 		// English, Mexico Spanish, Keyman IPA, and Keyman Hebrew
-		List<KeyboardInfo> availableKeyboards = handler.getAvailableKeyboards();
+		List<KeyboardInfo> availableKeyboards = handler.getAvailableKeyboards(this.getClass());
 		assertEquals(4, availableKeyboards.size());
 		KeyboardInfo info = availableKeyboards.get(0);  // English
 		checkKeyboardInfo(info, 0x0409, "en", "en_US; English (United States)", true);

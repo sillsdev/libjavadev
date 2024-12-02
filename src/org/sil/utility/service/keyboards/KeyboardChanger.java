@@ -45,7 +45,7 @@ public class KeyboardChanger {
 		this.stage = stage;
 	}
 
-	public void initKeyboardHandler() {
+	public void initKeyboardHandler(Class<?extends Object> classOfMainApp) {
 		String sOperatingSystem = System.getProperty("os.name");
 		if (sOperatingSystem.toLowerCase().contains("windows")) {
 			keyboardHandler = winHandler;
@@ -54,16 +54,16 @@ public class KeyboardChanger {
 		} else {
 			keyboardHandler = linuxHandler;
 		}
-		activeKeyboards = keyboardHandler.getAvailableKeyboards();
+		activeKeyboards = keyboardHandler.getAvailableKeyboards(classOfMainApp);
 		numberOfKeyboards = activeKeyboards.size();
-		keyboardHandler.rememberCurrentKeyboard();
+		keyboardHandler.rememberCurrentKeyboard(classOfMainApp);
 	}
 
-	public void closeKeyboardHandler() {
-		keyboardHandler.restoreCurrentKeyboard();
+	public void closeKeyboardHandler(Class<?extends Object> classOfMainApp) {
+		keyboardHandler.restoreCurrentKeyboard(classOfMainApp);
 	}
 
-	public void tryToChangeKeyboardTo(KeyboardInfo ki) {
+	public void tryToChangeKeyboardTo(KeyboardInfo ki, Class<?extends Object> classOfMainApp) {
 		if (activeKeyboards.size() == 0) {
 			return;  // nothing to do
 		}
@@ -75,12 +75,12 @@ public class KeyboardChanger {
 				ki = new KeyboardInfo(ki.getLocale(),
 						ki.getDescription(), ki.getWindowsLangID());
 			}
-			boolean result = winHandler.changeToKeyboard(ki, stage);
+			boolean result = winHandler.changeToKeyboard(ki, stage, classOfMainApp);
 			if (!result) {
 				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getDescription() + KEYBOARD_ID + ki.getWindowsLangID());
 			}
 		} else if (keyboardHandler == macHandler) {
-			boolean result = macHandler.changeToKeyboard(ki, stage);
+			boolean result = macHandler.changeToKeyboard(ki, stage, classOfMainApp);
 			if (!result) {
 				System.out.println(COULD_NOT_CHANGE_KEYBOARD + ki.getDescription() + "; (" + ki.getMacDescription() + ")");
 			}

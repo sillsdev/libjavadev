@@ -78,7 +78,7 @@ public class ControllerUtilitiesTest {
 		Button buttonToolbarFileNew = new Button(kTitle);
 		tooltipToolbarFileNew = ControllerUtilities.createToolbarButtonWithImage("newAction.png",
 				buttonToolbarFileNew, tooltipToolbarFileNew, resources.getString("tooltip.new"),
-				"test/org/sil/utility/");
+				"test/org/sil/utility/", ControllerUtilitiesTest.class);
 		assertNotNull(tooltipToolbarFileNew);
 		assertEquals("New Tree   Ctrl+N", tooltipToolbarFileNew.getText());
 		assertNotNull(buttonToolbarFileNew.getGraphic());

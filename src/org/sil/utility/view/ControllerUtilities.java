@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 SIL International 
+// Copyright (c) 2017-2024 SIL International 
 // This software is licensed under the LGPL, version 2.1 or later 
 // (http://www.gnu.org/licenses/lgpl-2.1.html) 
 /**
@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.CodeSource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -52,10 +54,10 @@ import javafx.stage.Stage;
  */
 public class ControllerUtilities {
 	public static Tooltip createToolbarButtonWithImage(String sUrl, Button buttonToolbar,
-			Tooltip buttonTooltip, String sTooltip, String sLocation) {
+			Tooltip buttonTooltip, String sTooltip, String sLocation, Class<?extends Object> classOfMainApp) {
 		ImageView imageView = new ImageView();
-		String sStandardIconURL = "file:resources/images/" + sUrl;
-		Image icon = getIconImageFromURL(sStandardIconURL, sLocation);
+		String sStandardIconURL = getUriOfProgram(classOfMainApp) + "/resources/images/" + sUrl;
+		Image icon = getIconImageFromURL(sStandardIconURL, sLocation, classOfMainApp);
 		imageView.setImage(icon);
 		buttonToolbar.setGraphic(imageView);
 		buttonTooltip = new Tooltip(sTooltip);
@@ -63,13 +65,45 @@ public class ControllerUtilities {
 		return buttonTooltip;
 	}
 
-	public static Image getIconImageFromURL(String sStandardIconURL, String sLocation) {
+	public static String getUriOfProgram(Class<?extends Object> classOfMainApp) {
+		String uriOfProgram="";
+		File jarFile;
+		try {
+			CodeSource codeSource = classOfMainApp.getProtectionDomain().getCodeSource();
+			jarFile = new File(codeSource.getLocation().toURI().getPath());
+			File parentFile = jarFile.getParentFile();
+			if (parentFile.getPath().toLowerCase().contains("eclipse")) {
+				// When using the Eclipse IDE we need this
+				uriOfProgram = parentFile.toURI().toString();
+			}
+			else {
+				// The installed version needs this
+				uriOfProgram = jarFile.getParentFile().getParentFile().toURI().toString();
+				String sOS = System.getProperty("os.name");
+				if (sOS.toLowerCase().contains("mac")) {
+					uriOfProgram = uriOfProgram.replaceFirst("Contents", "Contents/app");
+				}
+			}
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return uriOfProgram;
+	}
+
+	public static Image getIconImageFromURL(String sStandardIconURL, String sLocation, Class<?extends Object> classOfMainApp) {
 		Image icon = new Image(sStandardIconURL);
 		if (icon.getHeight() == 0) {
 			// normal location failed; try this one
 			String sSourcePath = sStandardIconURL.substring(0, 5) + sLocation
 					+ sStandardIconURL.substring(5);
 			icon = new Image(sSourcePath);
+			if (icon.getHeight() == 0) {
+				// failed again; try this; had problems on Linux
+				String sUriOfProgram = getUriOfProgram(classOfMainApp);
+				String sPathToTry = sUriOfProgram + sStandardIconURL.substring(5);
+				icon = new Image(sPathToTry);
+			}
 		}
 		return icon;
 	}

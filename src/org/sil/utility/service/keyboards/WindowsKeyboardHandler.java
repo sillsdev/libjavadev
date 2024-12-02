@@ -7,18 +7,18 @@ package org.sil.utility.service.keyboards;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.sil.utility.view.ControllerUtilities;
 
 import javafx.stage.Stage;
@@ -46,7 +46,7 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
     final String notKeymanKeyboard = "??";
     
 	@Override
-	public boolean changeToKeyboard(KeyboardInfo info, Stage stage) {
+	public boolean changeToKeyboard(KeyboardInfo info, Stage stage, Class<?extends Object> classOfMainApp) {
 		if (hWnd == null) {
 			hWnd = FXWinUtil.getNativeHandleForStage(stage);
 		}
@@ -105,10 +105,8 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 				String sKeyboardName = "";
 				String sKeyboardMaker = "";
 				String sJson = new String(Files.readAllBytes(json.toPath()), StandardCharsets.UTF_8);
-				JSONParser parser = new JSONParser();
-				Object parseObj = parser.parse(sJson);
-				JSONObject jsonObject = (JSONObject)parseObj;
-				JSONArray keyboards = (JSONArray)jsonObject.get("keyboards");
+				JSONObject jObject = new JSONObject(sJson);
+				JSONArray keyboards = jObject.getJSONArray("keyboards");
 				if (keyboards != null) {
 					JSONObject kb = (JSONObject)keyboards.get(0);
 					sKeyboardMaker = (String)kb.get("name");
@@ -122,19 +120,16 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 			} catch (IOException e) {
 				ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
 				e.printStackTrace();
-			} catch (ParseException e) {
-				ControllerUtilities.showExceptionInErrorDialog(e, sTitle, sHeader, sContent, sLabel);
-				e.printStackTrace();
 			}
 		}
 		return sResult;
 	}
 
 	@Override
-	public List<KeyboardInfo> getAvailableKeyboards() {
+	public List<KeyboardInfo> getAvailableKeyboards(Class<?extends Object> classOfMainApp) {
 		List<KeyboardInfo> results = new ArrayList<KeyboardInfo>();
 		String[] sLangIDs = new String[100];
-		int iCount = getCurrentWindowsLangIDs(sLangIDs);
+		int iCount = getCurrentWindowsLangIDs(sLangIDs, classOfMainApp);
 		for (int i = 0; i < iCount; i++) {
 			KeyboardInfo info = getKeyboardInfoFromProfile(sLangIDs[i]);
 			results.add(info);
@@ -188,14 +183,37 @@ public class WindowsKeyboardHandler extends KeyboardHandler {
 		return l;
 	}
 
-	protected int getCurrentWindowsLangIDs(String[] sLangIDs) {
+	protected int getCurrentWindowsLangIDs(String[] sLangIDs, Class<?extends Object> classOfMainApp) {
 		StringBuilder sb = new StringBuilder();
+		String progLocation = getLocationOfProgram(classOfMainApp);
 		sb.append("\"");
-		sb.append(System.getProperty("user.dir"));
+		sb.append(progLocation);
 		sb.append("\\resources\\Keyboards\\Windows\\GetKeyboardProfiles.exe\"");
 
 		final String dosCommand = sb.toString();
 		return getCurrentEnabledKeyboardIDs(dosCommand, sLangIDs);
+	}
+
+	protected String getLocationOfProgram(Class<?extends Object> classOfMainApp) {
+		String jarDir="";
+		File jarFile;
+		try {
+			CodeSource codeSource = classOfMainApp.getProtectionDomain().getCodeSource();
+			jarFile = new File(codeSource.getLocation().toURI().getPath());
+			File parentFile = jarFile.getParentFile();
+			if (parentFile.getPath().toLowerCase().contains("eclipse")) {
+				// when using the Eclipse IDE, we need this
+				jarDir = parentFile.getPath();
+			}
+			else {
+				// The installed version needs this
+				jarDir = jarFile.getParentFile().getParentFile().getPath();
+			}
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return jarDir;
 	}
 
 	@Override
