@@ -26,6 +26,7 @@ public class KeyboardInfo {
 		sLocale = "en";
 		locale = new Locale(sLocale);
 		description = "English";
+		macDescription = "US";
 		windowsLangID = -1;
 	}
 
